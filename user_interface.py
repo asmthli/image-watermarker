@@ -1,30 +1,28 @@
 import tkinter as tk
 
 
-class UI:
-    BACKGROUND_COLOUR = "grey"
-
+class UI(tk.Tk):
     def __init__(self):
-        self.window = tk.Tk()
-        self.window.title("Image Watermarker")
-        self.window.config(background=UI.BACKGROUND_COLOUR)
+        super().__init__()
+        self.title("Image Watermarker")
+        self.config(background="grey")
 
-        self.image = Image()
-        self.menu = Menu()
+        self.image = Image(self)
+        self.menu = Menu(self)
 
     def start_event_loop(self):
-        self.window.mainloop()
+        self.mainloop()
 
 
-class Menu:
-    def __init__(self):
-        self.canvas = tk.Canvas(width=800, height=100, background="indigo")
-        self.canvas.grid(row=1, column=0)
+class Menu(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        tk.Canvas(master=self, width=800, height=100, background="indigo").pack()
+        self.pack()
 
 
-class Image:
-    def __init__(self):
-        self.canvas = tk.Canvas(width=700, height=326, background="black")
-        self.canvas.grid(row=0, column=0)
-
-
+class Image(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        tk.Canvas(master=self, width=700, height=326, background="black").pack()
+        self.pack()
