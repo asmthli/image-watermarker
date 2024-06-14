@@ -30,6 +30,41 @@ class Image(tk.Frame):
         self.image_canvas.pack()
         self.pack()
 
+        # Keeps track of an item being dragged on the canvas.
+        self.drag_data = self.enable_dragging()
+
+    def enable_dragging(self):
+        """Adds event handling for dragging on any element added to the image canvas with tag 'draggable'.
+
+        :return Dictionary storing information about the item being dragged."""
+        def drag_start(event):
+            self.drag_data["item"] = self.image_canvas.find_closest(event.x, event.y)[0]
+            self.drag_data["x"] = event.x
+            self.drag_data["y"] = event.y
+
+        def drag_stop(event):
+            self.drag_data["item"] = None
+            self.drag_data["x"] = 0
+            self.drag_data["y"] = 0
+
+        def drag(event):
+            delta_x = event.x - self.drag_data["x"]
+            delta_y = event.y - self.drag_data["y"]
+            self.image_canvas.move(self.drag_data["item"], delta_x, delta_y)
+            self.drag_data["x"] = event.x
+            self.drag_data["y"] = event.y
+
+        self.image_canvas.tag_bind(tagOrId="draggable", sequence="<ButtonPress-1>", func=drag_start)
+        self.image_canvas.tag_bind(tagOrId="draggable", sequence="<ButtonRelease-1>", func=drag_stop)
+        self.image_canvas.tag_bind(tagOrId="draggable", sequence="<B1-Motion>", func=drag)
+
+        # Used to keep track of item being dragged.
+        drag_data = {"x": 0,
+                     "y": 0,
+                     "item": None}
+
+        return drag_data
+
     def load_image(self, filepath):
         image = PIL.Image.open(filepath)
         resized_image = image.resize(size=(self.canvas_size_width, self.canvas_size_height))
@@ -45,12 +80,30 @@ class Image(tk.Frame):
 class Menu(tk.Frame):
     def __init__(self, parent, image: Image):
         super().__init__(parent)
+        self.text_entry = None
+        self.add_text_btn = None
+
         self.pack()
         self.create_widgets()
         self.image = image
 
     def create_widgets(self):
+        self.text_entry = tk.Entry(master=self)
+        self.text_entry.pack()
+
         self.create_load_img_btn()
+        self.create_add_text_btn()
+
+    def create_add_text_btn(self):
+        def add_text():
+            self.image.image_canvas.create_text(20,
+                                                20,
+                                                text=self.text_entry.get(),
+                                                fill="white",
+                                                font=14,
+                                                tags=("draggable",))
+
+        tk.Button(master=self, text="Add Text", command=add_text).pack()
 
     def create_load_img_btn(self):
         def choose_img_dialogue():
@@ -58,7 +111,4 @@ class Menu(tk.Frame):
             if file_path:
                 self.image.load_image(file_path)
 
-        tk.Button(master=self, text="Button", command=choose_img_dialogue).pack()
-
-
-
+        tk.Button(master=self, text="Load Image", command=choose_img_dialogue).pack()
