@@ -86,8 +86,16 @@ class Image(tk.Frame):
         # Image must be referenced otherwise it is garbage collected after the method returns and will not
         # be shown in the canvas. Here we attach it to the image canvas itself (makes more sense than attaching it to
         # self).
-        self.image_canvas.image = tkImage
+        self.image_canvas.background_img = tkImage
         self.image_canvas.create_image(0, 0, anchor="nw", image=tkImage)
+
+    def add_watermark_logo(self, filepath):
+        image = PIL.Image.open(filepath)
+        resized_image = image.resize(size=(self.canvas_size_width // 4, self.canvas_size_height // 4))
+        tkImage = PIL.ImageTk.PhotoImage(image=resized_image)
+
+        self.image_canvas.watermark_logo = tkImage
+        self.image_canvas.create_image(0, 0, anchor="nw", image=tkImage, tags="draggable")
 
 
 class Menu(tk.Frame):
@@ -107,6 +115,7 @@ class Menu(tk.Frame):
         self.create_load_img_btn()
         self.create_add_text_btn()
         self.create_save_img_btn()
+        self.create_add_logo_btn()
 
     def create_add_text_btn(self):
         def add_text():
@@ -144,3 +153,11 @@ class Menu(tk.Frame):
                 self.image.load_image(file_path)
 
         tk.Button(master=self, text="Load Image", command=choose_img_dialogue).pack()
+
+    def create_add_logo_btn(self):
+        def choose_logo_dialogue():
+            file_path = filedialog.askopenfilename()
+            if file_path:
+                self.image.add_watermark_logo(file_path)
+
+        tk.Button(master=self, text="Add Logo", command=choose_logo_dialogue).pack()
