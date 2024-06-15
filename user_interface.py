@@ -3,6 +3,12 @@ from tkinter import filedialog
 
 import PIL.Image
 import PIL.ImageTk
+import PIL.ImageGrab
+
+import re
+
+import ctypes
+import platform
 
 
 class UI(tk.Tk):
@@ -13,6 +19,12 @@ class UI(tk.Tk):
 
         self.image = Image(self)
         self.menu = Menu(self, self.image)
+
+        # Fixes resolution scaling issue in Windows. Without it,
+        # tkinter was reporting a scaled resolution and so .winfo_x etc. was wrong.
+        if platform.system() == "Windows":
+            user32 = ctypes.windll.user32
+            user32.SetProcessDPIAware()
 
     def start_event_loop(self):
         self.mainloop()
@@ -37,6 +49,7 @@ class Image(tk.Frame):
         """Adds event handling for dragging on any element added to the image canvas with tag 'draggable'.
 
         :return Dictionary storing information about the item being dragged."""
+
         def drag_start(event):
             self.drag_data["item"] = self.image_canvas.find_closest(event.x, event.y)[0]
             self.drag_data["x"] = event.x
@@ -93,6 +106,7 @@ class Menu(tk.Frame):
 
         self.create_load_img_btn()
         self.create_add_text_btn()
+        self.create_save_img_btn()
 
     def create_add_text_btn(self):
         def add_text():
@@ -104,6 +118,24 @@ class Menu(tk.Frame):
                                                 tags=("draggable",))
 
         tk.Button(master=self, text="Add Text", command=add_text).pack()
+
+    def create_save_img_btn(self):
+        def save_image():
+            # There is no way to get file extension here. It simply filters the file types shown.
+            file_path = filedialog.asksaveasfilename(filetypes=(('PNG File', '.png'),))
+            # Raw string literal (with r prefix) is used to escape the '.' wildcard operator for regex.
+            if re.search(pattern="." + r"." + "png", string=file_path) is None:
+                file_path += ".png"
+
+            self.image.update_idletasks()
+            x0 = self.image.image_canvas.winfo_rootx()
+            y0 = self.image.image_canvas.winfo_rooty()
+            x1 = x0 + self.image.image_canvas.winfo_width()
+            y1 = y0 + self.image.image_canvas.winfo_height()
+
+            PIL.ImageGrab.grab(bbox=(x0, y0, x1, y1)).save(fp=file_path,)
+
+        tk.Button(master=self, text="Save Image", command=save_image).pack()
 
     def create_load_img_btn(self):
         def choose_img_dialogue():
