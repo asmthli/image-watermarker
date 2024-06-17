@@ -21,8 +21,7 @@ class Menu(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
-        self.text_entry = tk.Entry(master=self)
-        self.text_entry.pack()
+        self.text_entry = self.create_text_entry()
 
         self.create_load_img_btn()
         self.create_add_text_btn()
@@ -34,6 +33,11 @@ class Menu(tk.Frame):
 
         self.create_text_size_spinner()
 
+    def create_text_entry(self):
+        entry = tk.Entry(master=self)
+        entry.pack()
+        return entry
+
     def create_add_text_btn(self):
         def add_text():
             text_id = self.image.image_canvas.create_text(20,
@@ -41,7 +45,8 @@ class Menu(tk.Frame):
                                                           text=self.text_entry.get(),
                                                           fill="white",
                                                           font=14,
-                                                          tags=("draggable",))
+                                                          tags=("draggable",
+                                                                "selectable"))
             self.image.logo_text_ids.append(text_id)
 
         tk.Button(master=self, text="Add Text", command=add_text).pack()

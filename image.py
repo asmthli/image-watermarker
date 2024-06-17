@@ -20,6 +20,8 @@ class Image(tk.Frame):
         # Keeps track of an item being dragged on the canvas.
         self.drag_data = self.enable_dragging()
 
+        self.selected_item = self.enable_selection()
+
         self.watermark_logo_img = None
         self.watermark = None
 
@@ -59,6 +61,15 @@ class Image(tk.Frame):
 
         return drag_data
 
+    def enable_selection(self):
+        def select(event):
+            self.selected_item = self.image_canvas.find_closest(event.x, event.y)[0]
+            print("selected: ", self.selected_item)
+
+        self.image_canvas.tag_bind(tagOrId="selectable", sequence="<ButtonPress-1>", func=select)
+
+        return 0
+
     def load_image(self, filepath):
         self.watermark_logo_img = PIL.Image.open(filepath)
         resized_image = self.watermark_logo_img.resize(size=(self.canvas_size_width, self.canvas_size_height))
@@ -79,4 +90,5 @@ class Image(tk.Frame):
         self.watermark = self.image_canvas.create_image(0, 0,
                                                         anchor="nw",
                                                         image=self.image_canvas.watermark_logo_tkImage,
-                                                        tags="draggable")
+                                                        tags=("draggable",
+                                                              "selectable"))
