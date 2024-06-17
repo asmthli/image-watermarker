@@ -55,15 +55,16 @@ class Menu(tk.Frame):
         def choose_text_colour():
             colour_hex = tk.colorchooser.askcolor()[1]
 
-            for id_ in self.image.logo_text_ids:
-                self.image.image_canvas.itemconfigure(id_, fill=colour_hex)
+            if self.image.selected_item_id in self.image.logo_text_ids:
+                self.image.image_canvas.itemconfigure(self.image.selected_item_id,
+                                                      fill=colour_hex)
 
         tk.Button(master=self, text="Choose Text Colour", command=choose_text_colour).pack()
 
     def create_text_size_spinner(self):
         def change_font_sizes():
-            for id_ in self.image.logo_text_ids:
-                self.image.image_canvas.itemconfigure(id_, font=("Arial Baltic", self.image.text_size.get()))
+            if self.image.selected_item_id in self.image.logo_text_ids:
+                self.image.image_canvas.itemconfigure(self.image.selected_item_id, font=("Arial Baltic", self.image.text_size.get()))
 
         tk.Spinbox(master=self, command=change_font_sizes, textvariable=self.image.text_size, from_=1, to=20).pack()
 

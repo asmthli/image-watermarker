@@ -20,7 +20,7 @@ class Image(tk.Frame):
         # Keeps track of an item being dragged on the canvas.
         self.drag_data = self.enable_dragging()
 
-        self.selected_item = self.enable_selection()
+        self.selected_item_id = self.enable_selection()
 
         self.watermark_logo_img = None
         self.watermark = None
@@ -63,8 +63,7 @@ class Image(tk.Frame):
 
     def enable_selection(self):
         def select(event):
-            self.selected_item = self.image_canvas.find_closest(event.x, event.y)[0]
-            print("selected: ", self.selected_item)
+            self.selected_item_id = self.image_canvas.find_closest(event.x, event.y)[0]
 
         self.image_canvas.tag_bind(tagOrId="selectable", sequence="<ButtonPress-1>", func=select)
 
