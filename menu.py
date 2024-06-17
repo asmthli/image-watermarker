@@ -53,8 +53,10 @@ class Menu(tk.Frame):
 
     def create_add_text_btn(self):
         def add_text():
-            text_id = self.image.image_canvas.create_text(20,
-                                                          20,
+            x = self.image.winfo_width() // 2
+            y = self.image.winfo_height() // 2
+            text_id = self.image.image_canvas.create_text(x,
+                                                          y,
                                                           text=self.text_entry.get(),
                                                           fill="white",
                                                           font=14,
