@@ -27,7 +27,7 @@ class Image(tk.Frame):
         self.watermark = None
 
         self.logo_text_ids = []
-        self.text_size = tk.IntVar(value=12)
+        self.text_size = tk.IntVar(value=14)
 
     def enable_dragging(self):
         """Adds event handling for dragging on any element added to the image canvas with tag 'draggable'.

@@ -63,6 +63,7 @@ class Menu(tk.Frame):
                                                           tags=("draggable",
                                                                 "selectable"))
             self.image.logo_text_ids.append(text_id)
+            self.image.selected_item_id = text_id
 
         tk.Button(master=self, text="Add Text", command=add_text).grid(row=1, column=1)
 
