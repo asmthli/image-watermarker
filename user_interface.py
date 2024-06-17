@@ -45,6 +45,9 @@ class Image(tk.Frame):
         # Keeps track of an item being dragged on the canvas.
         self.drag_data = self.enable_dragging()
 
+        self.watermark_logo_img = None
+        self.watermark = None
+
     def enable_dragging(self):
         """Adds event handling for dragging on any element added to the image canvas with tag 'draggable'.
 
@@ -79,23 +82,26 @@ class Image(tk.Frame):
         return drag_data
 
     def load_image(self, filepath):
-        image = PIL.Image.open(filepath)
-        resized_image = image.resize(size=(self.canvas_size_width, self.canvas_size_height))
-        tkImage = PIL.ImageTk.PhotoImage(image=resized_image)
+        self.watermark_logo_img = PIL.Image.open(filepath)
+        resized_image = self.watermark_logo_img.resize(size=(self.canvas_size_width, self.canvas_size_height))
 
         # Image must be referenced otherwise it is garbage collected after the method returns and will not
         # be shown in the canvas. Here we attach it to the image canvas itself (makes more sense than attaching it to
         # self).
-        self.image_canvas.background_img = tkImage
-        self.image_canvas.create_image(0, 0, anchor="nw", image=tkImage)
+        self.image_canvas.background_img = PIL.ImageTk.PhotoImage(image=resized_image)
+        self.image_canvas.create_image(0, 0, anchor="nw", image=self.image_canvas.background_img)
 
     def add_watermark_logo(self, filepath):
-        image = PIL.Image.open(filepath)
-        resized_image = image.resize(size=(self.canvas_size_width // 4, self.canvas_size_height // 4))
-        tkImage = PIL.ImageTk.PhotoImage(image=resized_image)
+        self.watermark_logo_img = PIL.Image.open(filepath)
 
-        self.image_canvas.watermark_logo = tkImage
-        self.image_canvas.create_image(0, 0, anchor="nw", image=tkImage, tags="draggable")
+        resized_image = self.watermark_logo_img.resize(size=(self.canvas_size_width // 4, self.canvas_size_height // 4))
+
+        # Needs a reference to prevent garbage collection.
+        self.image_canvas.watermark_logo_tkImage = PIL.ImageTk.PhotoImage(image=resized_image)
+        self.watermark = self.image_canvas.create_image(0, 0,
+                                                        anchor="nw",
+                                                        image=self.image_canvas.watermark_logo_tkImage,
+                                                        tags="draggable")
 
 
 class Menu(tk.Frame):
@@ -116,6 +122,8 @@ class Menu(tk.Frame):
         self.create_add_text_btn()
         self.create_save_img_btn()
         self.create_add_logo_btn()
+
+        self.create_size_slider()
 
     def create_add_text_btn(self):
         def add_text():
@@ -161,3 +169,23 @@ class Menu(tk.Frame):
                 self.image.add_watermark_logo(file_path)
 
         tk.Button(master=self, text="Add Logo", command=choose_logo_dialogue).pack()
+
+    def create_size_slider(self):
+        def adjust_watermark_img_size(event_slide_value):
+            event_slide_value = int(event_slide_value)
+            new_width = event_slide_value * 40
+            new_height = event_slide_value * 30
+
+            resized_image = self.image.watermark_logo_img.resize(size=(new_width, new_height))
+            resized_tkImage = PIL.ImageTk.PhotoImage(image=resized_image)
+            # Again needs to be referenced, so it isn't garbage collected.
+            self.image.image_canvas.watermark_logo = resized_tkImage
+            self.image.image_canvas.itemconfigure(self.image.watermark, image=resized_tkImage)
+
+        slider = tk.Scale(master=self,
+                          orient="horizontal",
+                          command=adjust_watermark_img_size,
+                          from_=1,
+                          to=100,
+                          variable=tk.IntVar(value=50))
+        slider.pack()
