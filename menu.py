@@ -15,6 +15,9 @@ class Menu(tk.Frame):
         super().__init__(parent)
         self.pack()
 
+        self.grid_columnconfigure((0, 1, 2, 3, 4, 5), pad=20)
+        self.grid_rowconfigure((0, 1), pad=2)
+
         self.text_entry = None
         self.add_text_btn = None
 
@@ -38,7 +41,7 @@ class Menu(tk.Frame):
 
     def create_labels(self):
         tk.Label(master=self, text="Adjust Text Size").grid(row=0, column=2)
-        tk.Label(master=self, text="Adjust Logo Size").grid(row=0, column=3)
+        tk.Label(master=self, text="Adjust Logo Size").grid(row=0, column=4)
 
     def create_text_entry(self):
         entry = tk.Entry(master=self,
@@ -68,7 +71,7 @@ class Menu(tk.Frame):
                 self.image.image_canvas.itemconfigure(self.image.selected_item_id,
                                                       fill=colour_hex)
 
-        tk.Button(master=self, text="Choose Text Colour", command=choose_text_colour).grid(row=0, column=4, rowspan=2)
+        tk.Button(master=self, text="Choose Text Colour", command=choose_text_colour).grid(row=0, column=3, rowspan=2)
 
     def create_text_size_spinner(self):
         def change_font_sizes():
@@ -80,7 +83,7 @@ class Menu(tk.Frame):
                    command=change_font_sizes,
                    textvariable=self.image.text_size,
                    from_=1,
-                   to=20).grid(row=1, column=2, sticky="s", pady=2)
+                   to=60).grid(row=1, column=2, sticky="n", pady=2)
 
     def create_save_img_btn(self):
         def save_image():
@@ -96,7 +99,7 @@ class Menu(tk.Frame):
             x1 = x0 + self.image.image_canvas.winfo_width()
             y1 = y0 + self.image.image_canvas.winfo_height()
 
-            PIL.ImageGrab.grab(bbox=(x0, y0, x1, y1)).save(fp=file_path,)
+            PIL.ImageGrab.grab(bbox=(x0, y0, x1, y1)).save(fp=file_path, )
 
         tk.Button(master=self, text="Save Image", command=save_image).grid(row=1, column=0)
 
@@ -133,5 +136,6 @@ class Menu(tk.Frame):
                           command=adjust_watermark_img_size,
                           from_=1,
                           to=100,
-                          variable=tk.IntVar(value=50))
-        slider.grid(row=1, column=3)
+                          variable=tk.IntVar(value=50),
+                          showvalue=False)
+        slider.grid(row=1, column=4, sticky="n")

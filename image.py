@@ -8,6 +8,8 @@ import PIL.ImageGrab
 class Image(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
+        self.pack()
+
         self.canvas_size_width = 800
         self.canvas_size_height = 526
         self.image_canvas = tk.Canvas(master=self,
@@ -15,7 +17,6 @@ class Image(tk.Frame):
                                       height=self.canvas_size_height,
                                       background="black")
         self.image_canvas.pack()
-        self.pack()
 
         # Keeps track of an item being dragged on the canvas.
         self.drag_data = self.enable_dragging()
@@ -62,6 +63,12 @@ class Image(tk.Frame):
         return drag_data
 
     def enable_selection(self):
+        """
+        Adds ability to select widgets which are tagged with 'selectable'.
+
+        Selected item ID can be accessed through the instance variable 'self.selected_item.id'.
+        :return: An initial ID of 0 (given IDs start from 1 and so this corresponds to nothing being selected).
+        """
         def select(event):
             self.selected_item_id = self.image_canvas.find_closest(event.x, event.y)[0]
 
