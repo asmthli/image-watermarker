@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, colorchooser
 
 import PIL.Image
 import PIL.ImageTk
@@ -47,6 +47,8 @@ class Image(tk.Frame):
 
         self.watermark_logo_img = None
         self.watermark = None
+
+        self.logo_text_ids = []
 
     def enable_dragging(self):
         """Adds event handling for dragging on any element added to the image canvas with tag 'draggable'.
@@ -122,19 +124,31 @@ class Menu(tk.Frame):
         self.create_add_text_btn()
         self.create_save_img_btn()
         self.create_add_logo_btn()
+        self.create_text_colour_btn()
 
         self.create_size_slider()
 
     def create_add_text_btn(self):
         def add_text():
-            self.image.image_canvas.create_text(20,
-                                                20,
-                                                text=self.text_entry.get(),
-                                                fill="white",
-                                                font=14,
-                                                tags=("draggable",))
+            text_id = self.image.image_canvas.create_text(20,
+                                                          20,
+                                                          text=self.text_entry.get(),
+                                                          fill="white",
+                                                          font=14,
+                                                          tags=("draggable",))
+            self.image.logo_text_ids.append(text_id)
 
         tk.Button(master=self, text="Add Text", command=add_text).pack()
+
+    def create_text_colour_btn(self):
+        def choose_text_colour():
+            colour_hex = tk.colorchooser.askcolor()[1]
+            print(colour_hex)
+
+            for id_ in self.image.logo_text_ids:
+                self.image.image_canvas.itemconfigure(id_, fill=colour_hex)
+
+        tk.Button(master=self, text="Choose Text Colour", command=choose_text_colour).pack()
 
     def create_save_img_btn(self):
         def save_image():
