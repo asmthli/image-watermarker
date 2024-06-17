@@ -20,6 +20,7 @@ class Menu(tk.Frame):
 
         self.text_entry = None
         self.add_text_btn = None
+        self.logo_size_slider = None
 
         self.image = image
         self.create_widgets()
@@ -33,7 +34,7 @@ class Menu(tk.Frame):
         self.create_add_logo_btn()
         self.create_text_colour_btn()
 
-        self.create_size_slider()
+        self.logo_size_slider = self.create_size_slider()
 
         self.create_labels()
 
@@ -117,6 +118,8 @@ class Menu(tk.Frame):
             if file_path:
                 self.image.add_watermark_logo(file_path)
 
+                self.logo_size_slider.config(state=tk.ACTIVE)
+
         tk.Button(master=self, text="Add Logo", command=choose_logo_dialogue).grid(row=0, column=5, rowspan=2)
 
     def create_size_slider(self):
@@ -137,5 +140,7 @@ class Menu(tk.Frame):
                           from_=1,
                           to=100,
                           variable=tk.IntVar(value=50),
-                          showvalue=False)
+                          showvalue=False,
+                          state=tk.DISABLED)
         slider.grid(row=1, column=4, sticky="n")
+        return slider
