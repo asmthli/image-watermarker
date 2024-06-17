@@ -49,6 +49,7 @@ class Image(tk.Frame):
         self.watermark = None
 
         self.logo_text_ids = []
+        self.text_size = tk.IntVar(value=12)
 
     def enable_dragging(self):
         """Adds event handling for dragging on any element added to the image canvas with tag 'draggable'.
@@ -112,9 +113,9 @@ class Menu(tk.Frame):
         self.text_entry = None
         self.add_text_btn = None
 
+        self.image = image
         self.pack()
         self.create_widgets()
-        self.image = image
 
     def create_widgets(self):
         self.text_entry = tk.Entry(master=self)
@@ -127,6 +128,8 @@ class Menu(tk.Frame):
         self.create_text_colour_btn()
 
         self.create_size_slider()
+
+        self.create_text_size_spinner()
 
     def create_add_text_btn(self):
         def add_text():
@@ -143,12 +146,18 @@ class Menu(tk.Frame):
     def create_text_colour_btn(self):
         def choose_text_colour():
             colour_hex = tk.colorchooser.askcolor()[1]
-            print(colour_hex)
 
             for id_ in self.image.logo_text_ids:
                 self.image.image_canvas.itemconfigure(id_, fill=colour_hex)
 
         tk.Button(master=self, text="Choose Text Colour", command=choose_text_colour).pack()
+
+    def create_text_size_spinner(self):
+        def change_font_sizes():
+            for id_ in self.image.logo_text_ids:
+                self.image.image_canvas.itemconfigure(id_, font=("Arial Baltic", self.image.text_size.get()))
+
+        tk.Spinbox(master=self, command=change_font_sizes, textvariable=self.image.text_size, from_=1, to=20).pack()
 
     def create_save_img_btn(self):
         def save_image():
