@@ -13,11 +13,12 @@ from PIL import ImageTk, ImageGrab
 class Menu(tk.Frame):
     def __init__(self, parent, image: Image):
         super().__init__(parent)
+        self.pack()
+
         self.text_entry = None
         self.add_text_btn = None
 
         self.image = image
-        self.pack()
         self.create_widgets()
 
     def create_widgets(self):
@@ -31,11 +32,19 @@ class Menu(tk.Frame):
 
         self.create_size_slider()
 
+        self.create_labels()
+
         self.create_text_size_spinner()
 
+    def create_labels(self):
+        tk.Label(master=self, text="Adjust Text Size").grid(row=0, column=2)
+        tk.Label(master=self, text="Adjust Logo Size").grid(row=0, column=3)
+
     def create_text_entry(self):
-        entry = tk.Entry(master=self)
-        entry.pack()
+        entry = tk.Entry(master=self,
+                         justify=tk.CENTER,
+                         textvariable=tk.StringVar(value="Enter Text Here"))
+        entry.grid(row=0, column=1, sticky="ns")
         return entry
 
     def create_add_text_btn(self):
@@ -49,7 +58,7 @@ class Menu(tk.Frame):
                                                                 "selectable"))
             self.image.logo_text_ids.append(text_id)
 
-        tk.Button(master=self, text="Add Text", command=add_text).pack()
+        tk.Button(master=self, text="Add Text", command=add_text).grid(row=1, column=1)
 
     def create_text_colour_btn(self):
         def choose_text_colour():
@@ -59,14 +68,19 @@ class Menu(tk.Frame):
                 self.image.image_canvas.itemconfigure(self.image.selected_item_id,
                                                       fill=colour_hex)
 
-        tk.Button(master=self, text="Choose Text Colour", command=choose_text_colour).pack()
+        tk.Button(master=self, text="Choose Text Colour", command=choose_text_colour).grid(row=0, column=4, rowspan=2)
 
     def create_text_size_spinner(self):
         def change_font_sizes():
             if self.image.selected_item_id in self.image.logo_text_ids:
-                self.image.image_canvas.itemconfigure(self.image.selected_item_id, font=("Arial Baltic", self.image.text_size.get()))
+                self.image.image_canvas.itemconfigure(self.image.selected_item_id,
+                                                      font=("Arial Baltic", self.image.text_size.get()))
 
-        tk.Spinbox(master=self, command=change_font_sizes, textvariable=self.image.text_size, from_=1, to=20).pack()
+        tk.Spinbox(master=self,
+                   command=change_font_sizes,
+                   textvariable=self.image.text_size,
+                   from_=1,
+                   to=20).grid(row=1, column=2, sticky="s", pady=2)
 
     def create_save_img_btn(self):
         def save_image():
@@ -84,7 +98,7 @@ class Menu(tk.Frame):
 
             PIL.ImageGrab.grab(bbox=(x0, y0, x1, y1)).save(fp=file_path,)
 
-        tk.Button(master=self, text="Save Image", command=save_image).pack()
+        tk.Button(master=self, text="Save Image", command=save_image).grid(row=1, column=0)
 
     def create_load_img_btn(self):
         def choose_img_dialogue():
@@ -92,7 +106,7 @@ class Menu(tk.Frame):
             if file_path:
                 self.image.load_image(file_path)
 
-        tk.Button(master=self, text="Load Image", command=choose_img_dialogue).pack()
+        tk.Button(master=self, text="Load Image", command=choose_img_dialogue).grid(row=0, column=0)
 
     def create_add_logo_btn(self):
         def choose_logo_dialogue():
@@ -100,7 +114,7 @@ class Menu(tk.Frame):
             if file_path:
                 self.image.add_watermark_logo(file_path)
 
-        tk.Button(master=self, text="Add Logo", command=choose_logo_dialogue).pack()
+        tk.Button(master=self, text="Add Logo", command=choose_logo_dialogue).grid(row=0, column=5, rowspan=2)
 
     def create_size_slider(self):
         def adjust_watermark_img_size(event_slide_value):
@@ -120,4 +134,4 @@ class Menu(tk.Frame):
                           from_=1,
                           to=100,
                           variable=tk.IntVar(value=50))
-        slider.pack()
+        slider.grid(row=1, column=3)
