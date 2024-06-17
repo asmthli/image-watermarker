@@ -86,6 +86,15 @@ class Image(tk.Frame):
         self.image_canvas.background_img = PIL.ImageTk.PhotoImage(image=resized_image)
         self.image_canvas.create_image(0, 0, anchor="nw", image=self.image_canvas.background_img)
 
+    def save_image(self, filepath):
+        self.update_idletasks()
+        x0 = self.image_canvas.winfo_rootx()
+        y0 = self.image_canvas.winfo_rooty()
+        x1 = x0 + self.image_canvas.winfo_width()
+        y1 = y0 + self.image_canvas.winfo_height()
+
+        PIL.ImageGrab.grab(bbox=(x0, y0, x1, y1)).save(fp=filepath, )
+
     def add_watermark_logo(self, filepath):
         self.watermark_logo_img = PIL.Image.open(filepath)
 
